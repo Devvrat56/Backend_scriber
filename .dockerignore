@@ -1,5 +1,8 @@
+# Exclude Version Control
 .git
 .github
+
+# Exclude Build artifacts
 __pycache__
 *.pyc
 *.pyo
@@ -10,12 +13,35 @@ venv
 .venv
 pip-log.txt
 pip-delete-this-directory.txt
-.env
-.env.*
+
+# Exclude Local DBs & Uploads
 carelinq.db
 uploads/*
 storage/*
+
+# Exclude Development Directories (Very important for size)
+Care_scribe_backend/
+Medical_chatbot_doctor/
+Care-LINQ/
+Care_scribe_backend_integration/
+temp_audio/
+*.pdf
+*.wav
+*.mp3
+
+# Exclude Docker files
 Dockerfile
 .dockerignore
+Procfile
+
+# Exclude general garbage
 node_modules
 tests
+.pytest_cache
+.coverage
+htmlcov
+.tox
+.nox
+.vscode
+.idea
+*.log
