@@ -1,8 +1,10 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api import scribe_routes, chat_routes
+from api import scribe_routes, chat_routes, history_routes
 from core.config import settings
+
+from db.session import init_db
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -18,7 +20,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,12 +29,20 @@ app.add_middleware(
 # Include routers
 app.include_router(scribe_routes.router, prefix=settings.API_V1_STR)
 app.include_router(chat_routes.router, prefix=settings.API_V1_STR)
+app.include_router(history_routes.router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
 async def startup_event():
     # Ensure upload directory exists
     if not os.path.exists(settings.UPLOAD_DIR):
         os.makedirs(settings.UPLOAD_DIR)
+    
+    # Initialize Database
+    try:
+        init_db()
+        print("Database initialized successfully.")
+    except Exception as e:
+        print(f"Database initialization failed: {e}")
 
 @app.get("/")
 async def root():
@@ -40,4 +50,5 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

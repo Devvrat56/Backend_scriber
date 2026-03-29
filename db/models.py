@@ -39,3 +39,21 @@ class ChatMessage(Base):
     
     # Relationships
     session = relationship("ChatSession", back_populates="messages")
+
+class ScribeSession(Base):
+    __tablename__ = "scribe_sessions"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    transcript = Column(Text)
+    summary = Column(Text)
+    entities = Column(Text)  # Store as JSON string
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ReportAnalysis(Base):
+    __tablename__ = "report_analyses"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    file_name = Column(String)
+    extracted_text = Column(Text)
+    summary = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)

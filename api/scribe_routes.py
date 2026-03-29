@@ -1,7 +1,11 @@
 import os
 import uuid
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+import json
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Depends
 from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
+from db.session import get_db
+from db import models
 from services.scribe_service import scribe_service
 from services.summary_service import summary_service
 from core.config import settings
@@ -9,6 +13,9 @@ from pydantic import BaseModel
 from typing import List, Dict
 
 router = APIRouter(prefix="/scribe", tags=["AI Scribe"])
+
+# Ensure the upload directory exists
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 class AnalysisRequest(BaseModel):
     transcript: str
@@ -25,7 +32,7 @@ class PDFRequest(BaseModel):
 
 @router.post("/transcribe", response_model=Dict)
 async def transcribe_audio(file: UploadFile = File(...)):
-    # Expanded list of supported formats (case-insensitive)
+    # ... (existing allowed_extensions logic)
     allowed_extensions = {".wav", ".mp3", ".m4a", ".webm", ".mpga", ".mp4", ".mpeg", ".ogg"}
     file_ext = os.path.splitext(file.filename)[1].lower()
     
@@ -41,7 +48,6 @@ async def transcribe_audio(file: UploadFile = File(...)):
     
     try:
         transcript = scribe_service.transcribe(file_path)
-        # Background task to delete the file
         os.remove(file_path)
         return {"transcript": transcript}
     except Exception as e:
@@ -50,17 +56,29 @@ async def transcribe_audio(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze", response_model=ScribeResult)
-async def analyze_transcript(request: AnalysisRequest):
+async def analyze_transcript(request: AnalysisRequest, db: Session = Depends(get_db)):
     try:
         entities = scribe_service.extract_entities(request.transcript)
         summary = summary_service.generate_clinical_summary(request.transcript, entities)
+        
+        # Persistence Logic
+        session = models.ScribeSession(
+            transcript=request.transcript,
+            summary=summary,
+            entities=json.dumps(entities)
+        )
+        db.add(session)
+        db.commit()
+        
         return {
             "transcript": request.transcript,
             "entities": entities,
             "summary": summary
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        db.rollback()
+        print(f"Scribe Analysis Failed: {str(e)}") # Critical for backend visibility
+        raise HTTPException(status_code=500, detail=f"Analysis Engine Error: {str(e)}")
 
 @router.post("/summarize")
 async def generate_summary_only(request: AnalysisRequest):

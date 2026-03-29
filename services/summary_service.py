@@ -20,35 +20,68 @@ class SummaryService:
         entity_str = ", ".join([f"{e['text']} ({e['label']})" for e in entities])
         
         prompt = f"""
-        You are a highly skilled medical scribe. Create a patient-friendly summary from this consultation.
+        You are a warm, highly empathetic medical scribe. Write a supportive 'Personalized Care Plan' for a patient.
         
         CONSULTATION DATA:
-        Transcript: {transcript}
-        Key Medical Details (extracted): {entity_str}
+        - Transcription: {transcript}
+        - Key Details: {entity_str}
         
-        REQUIREMENTS:
-        1. **Patient Context**: Briefly mention relevant details like current state or reason for visit.
-        2. **Surgery Info**: Detail any surgery mentioned (pre-op instructions or post-op care/injuries).
-        3. **Medication Schedule**: List medications with exact dosages and *specific time slots* (e.g., Morning/Night).
-        4. **Pain/Symptom Management**: Address any pain or injuries discussed.
-        5. **Empathetic Tone**: Use clear, reassuring, and simple language.
+        INSTRUCTIONS FOR EMPATHETIC CLARITY:
+        1. **Tone**: Be warm, reassuring, and use 'You'/ 'Your'. 
+        2. **Language**: Use 5th-grade reading level. Avoid jargon (e.g., 'high blood pressure' instead of 'hypertension').
+        3. **Structure**: 
+           - **Overview**: A friendly summary.
+           - **Medicine Schedule**: Simple instructions.
+           - **Your Next Steps**: Actionable items.
         
-        PATIENT SUMMARY:
+        YOUR PERSONALIZED CARE PLAN:
         """
         
         try:
             completion = self.client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=[
-                    {"role": "system", "content": "You provide clear, accurate, and empathetic medical summaries for patients."},
+                    {"role": "system", "content": "You are a warm medical assistant providing clear, low-jargon, and empathetic care plans."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.3,
-                max_tokens=2048,
+                max_tokens=1024,
             )
             return completion.choices[0].message.content
         except Exception as e:
             return f"Error generating summary: {str(e)}"
+
+    def summarize_report(self, extracted_text: str) -> str:
+        if not self.client:
+            return "Error: Groq API Key missing."
+            
+        prompt = f"""
+        You are a helpful clinical report analyzer. Summarize these medical report findings for a patient in plain, reassuring language.
+        
+        RAW EXTRACTED TEXT:
+        {extracted_text}
+        
+        INSTRUCTIONS:
+        1. **Overview**: Explain what kind of report this is (e.g., "This is your blood test report").
+        2. **Key Findings**: List the most important numbers or results in simple terms (e.g., "Your sugar levels are normal").
+        3. **Supportive Advice**: Add a reassuring sentence about discussing this with a doctor soon.
+        
+        YOUR REPORT SUMMARY:
+        """
+        
+        try:
+            completion = self.client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": "You are a clinical assistant who simplifies report findings into clear, patient-friendly summaries."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=1024,
+            )
+            return completion.choices[0].message.content
+        except Exception as e:
+            return f"Error summarizing report: {str(e)}"
 
     def generate_pdf_summary(self, transcript: str, entities: List[Dict], summary_text: str, output_path: str):
         pdf = FPDF()

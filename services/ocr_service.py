@@ -7,8 +7,15 @@ from core.config import settings
 
 class OCRService:
     def __init__(self):
-        # Initialize EasyOCR reader
-        self.reader = easyocr.Reader(['en'])
+        # Move reader to a private property for lazy loading
+        self._reader = None
+
+    @property
+    def reader(self):
+        if self._reader is None:
+            print("Initializing EasyOCR Reader...")
+            self._reader = easyocr.Reader(['en'])
+        return self._reader
 
     def extract_text_from_file(self, file_path: str) -> str:
         ext = os.path.splitext(file_path)[1].lower()
@@ -45,4 +52,5 @@ class OCRService:
         results = self.reader.readtext(img_np)
         return " ".join([res[1] for res in results])
 
+# Instantiate service without immediate heavy reader initialization
 ocr_service = OCRService()

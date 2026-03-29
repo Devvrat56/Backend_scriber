@@ -28,9 +28,10 @@ class ScribeService:
         if not os.path.exists(audio_path):
             raise FileNotFoundError(f"Audio file {audio_path} not found")
         
-        with open(audio_path, "rb") as file:
+        # Open in binary mode and pass the file object directly for better MIME type detection
+        with open(audio_path, "rb") as file_handle:
             transcription = self.client.audio.transcriptions.create(
-                file=(audio_path, file.read()),
+                file=(os.path.basename(audio_path), file_handle.read()), # Send basename + binary content
                 model="whisper-large-v3",
                 response_format="verbose_json",
             )
@@ -97,30 +98,31 @@ class ScribeService:
         entity_str = ", ".join([f"{e['text']} ({e['label']})" for e in entities])
         
         prompt = f"""
-        You are a highly skilled medical scribe. Create a patient-friendly summary from this consultation.
+        You are a warm, highly empathetic medical scribe. Your goal is to write a supportive 'Personalized Care Plan' for a patient based on their consultation.
         
         CONSULTATION DATA:
-        Transcript: {transcript}
-        Key Medical Details (extracted): {entity_str}
+        - Transcription: {transcript}
+        - Key Details: {entity_str}
         
-        REQUIREMENTS:
-        1. **Patient Context**: Briefly mention relevant details like current state or reason for visit.
-        2. **Surgery Info**: Detail any surgery mentioned (pre-op instructions or post-op care/injuries).
-        3. **Medication Schedule**: List medications with exact dosages and *specific time slots* (e.g., Morning/Night).
-        4. **Pain/Symptom Management**: Address any pain or injuries discussed.
-        5. **Empathetic Tone**: Use clear, reassuring, and simple language.
+        INSTRUCTIONS FOR EMPATHETIC CLARITY:
+        1. **Tone**: Be warm, reassuring, and use 'You'/ 'Your'. 
+        2. **Language**: Use 5th-grade reading level. Avoid jargon (e.g., say 'high blood pressure' instead of 'hypertension', 'sugar levels' instead of 'glycemia').
+        3. **Structure**: 
+           - **Overview**: A friendly summary of what was discussed.
+           - **Medicine Schedule**: Clear instructions for any pills or treatments.
+           - **Your Next Steps**: Simple, actionable items for the patient.
         
-        PATIENT SUMMARY:
+        YOUR PERSONALIZED CARE PLAN:
         """
         
         completion = self.client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": "You provide clear, accurate, and empathetic medical summaries for patients."},
+                {"role": "system", "content": "You are a warm medical assistant. You provide clear, very simple, and empathetic care plans for patients, avoiding all complex medical jargon."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
-            max_tokens=2048,
+            max_tokens=1024,
         )
         
         return completion.choices[0].message.content
