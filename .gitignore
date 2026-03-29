@@ -1,0 +1,25 @@
+# Environment files
+.env
+
+# Python Virtual Environment
+venv/
+.venv/
+env/
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Project uploads/storage
+uploads/
+storage/
+
+# Databases
+*.db
+*.sqlite3
+
+# IDEs
+.vscode/
+.idea/

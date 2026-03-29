@@ -1,0 +1,34 @@
+# Core
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+pydantic
+pydantic-settings
+jinja2
+requests
+python-jose[cryptography]
+passlib[bcrypt]
+
+# AI & LLM
+groq
+openai
+rapidfuzz
+scispaCy
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
+
+# Audio & Speech
+pydub
+SpeechRecognition
+fpdf2
+
+# OCR & PDF
+easyocr
+pymupdf
+pillow
+numpy
+
+# Database
+sqlalchemy
+alembic
+psycopg2-binary
