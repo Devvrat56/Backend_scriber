@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set working directory
 WORKDIR /app
 
-# 1. Install CPU-only Torch FIRST to prevent EasyOCR from pulling the 2GB CUDA version
-RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+# 1. Install CPU-only Torch and pin Numpy < 2.0.0 to prevent version conflicts
+RUN pip install --no-cache-dir "numpy<2.0.0" torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # 2. Install remaining dependencies
 COPY requirements.txt .
