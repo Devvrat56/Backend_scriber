@@ -41,11 +41,11 @@ class ChatService:
           "This may require immediate medical attention. Please contact your nearest emergency service or your oncologist right away."
 
         RESPONSE FORMAT:
-        - Respond naturally and conversationally in flowing paragraphs.
-        - Start by understanding and acknowledging the patient's concern with high empathy.
-        - Explain relevant medical concepts simply, offer general guidance/next steps, and always include a safety note if relevant.
-        - End with a welcoming follow-up question to keep the conversation engaging and supportive.
-        - Do not use rigid formatting headers (e.g. avoid '### Understanding:').
+        - Respond naturally and conversationally in a SINGLE brief paragraph.
+        - Keep your standard response strictly to 3-4 lines long.
+        - Only expand your paragraph to a maximum of 5-8 lines IF the user explicitly asks for a detailed explanation.
+        - Combine empathy, medical concept explanation, safety notes, and a welcoming follow-up question seamlessly into this one paragraph.
+        - Do not use any headings, lists, or rigid formatting.
 
         PATIENT CONTEXT:
         - Case: {cancer_type} | Stage: {cancer_stage}
@@ -89,7 +89,7 @@ You are a professional Medical Assistant for Oncologists. Your goal is to provid
         1. Classify Risk Level silently.
         2. IF HIGH RISK (Emergency): You must respond ONLY with this exact string and NOTHING ELSE (no extra advice):
            "This may require immediate medical attention. Please contact your nearest emergency service or your oncologist right away."
-        3. IF NOT HIGH RISK: Reply in a natural, supportive paragraph structure. Combine empathy, explanation, and gentle guidance into a seamless response, ending with a follow-up question.
+        3. IF NOT HIGH RISK: Reply in a SINGLE, supportive paragraph (3-4 lines maximum). Only expand to 5-8 lines if explicitly asked for a detailed explanation. Combine empathy, explanation, and gentle guidance seamlessly, ending with a follow-up question.
         4. Detect emotional distress and use highly empathetic phrases.
         """
         
