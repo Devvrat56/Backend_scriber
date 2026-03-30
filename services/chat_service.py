@@ -40,19 +40,12 @@ class ChatService:
         - If HIGH RISK -> Prioritize EMERGENCY OVERRIDE: 
           "This may require immediate medical attention. Please contact your nearest emergency service or your oncologist right away."
 
-        RESPONSE FORMAT (STRICT ENFORCEMENT):
-        - For medical queries or symptom descriptions, your response MUST use these exact headings:
-          ### Understanding:
-          (Briefly restate the user's concern with empathy)
-          ### Explanation:
-          (Explain the medical concept in simple terms)
-          ### Guidance:
-          (Provide general next steps, non-prescriptive)
-          ### Safety Note:
-          (Mention when specifically to seek medical attention)
-          ### Optional Follow-up:
-          (Ask a helpful question to continue support)
-        - For casual greetings or small talk (like "hello", "hi"): Simply respond warmly and naturally without any headings.
+        RESPONSE FORMAT:
+        - Respond naturally and conversationally in flowing paragraphs.
+        - Start by understanding and acknowledging the patient's concern with high empathy.
+        - Explain relevant medical concepts simply, offer general guidance/next steps, and always include a safety note if relevant.
+        - End with a welcoming follow-up question to keep the conversation engaging and supportive.
+        - Do not use rigid formatting headers (e.g. avoid '### Understanding:').
 
         PATIENT CONTEXT:
         - Case: {cancer_type} | Stage: {cancer_stage}
@@ -94,11 +87,10 @@ You are a professional Medical Assistant for Oncologists. Your goal is to provid
         
         CRITICAL INSTRUCTIONS:
         1. Classify Risk Level silently.
-        2. IF HIGH RISK (Emergency): You must respond ONLY with this exact string and NOTHING ELSE (no headings, no extra advice):
+        2. IF HIGH RISK (Emergency): You must respond ONLY with this exact string and NOTHING ELSE (no extra advice):
            "This may require immediate medical attention. Please contact your nearest emergency service or your oncologist right away."
-        3. IF CASUAL GREETING/SMALL TALK: Reply with a simple, warm, natural greeting without any headings, asking how you can support them today.
-        4. IF MEDICAL QUERY/SYMPTOMS: Follow the 5-point structure strictly. Ensure the "### Understanding:" heading is the very first thing you write.
-        5. Detect emotional distress and use empathetic phrases.
+        3. IF NOT HIGH RISK: Reply in a natural, supportive paragraph structure. Combine empathy, explanation, and gentle guidance into a seamless response, ending with a follow-up question.
+        4. Detect emotional distress and use highly empathetic phrases.
         """
         
         history.append({"role": "user", "content": dynamic_user_prompt})
