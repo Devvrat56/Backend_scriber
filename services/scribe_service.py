@@ -75,7 +75,7 @@ class ScribeService:
         
         try:
             completion = self.client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
                 response_format={"type": "json_object"}
@@ -116,7 +116,7 @@ class ScribeService:
         """
         
         completion = self.client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": "You are a warm medical assistant. You provide clear, very simple, and empathetic care plans for patients, avoiding all complex medical jargon."},
                 {"role": "user", "content": prompt}
